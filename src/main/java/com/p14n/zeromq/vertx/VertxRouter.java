@@ -27,5 +27,7 @@ public class VertxRouter extends AsyncRouter {
                 messageResponder.respond(message.body());
             }
         });
+        System.out.println("sent to VERT " + new String(msg));
+
     }
 }

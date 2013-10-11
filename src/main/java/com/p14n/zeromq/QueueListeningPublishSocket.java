@@ -25,9 +25,9 @@ public class QueueListeningPublishSocket implements Runnable {
     @Override
     public void run() {
 
-        ZMQ.Socket pub = c.socket(ZMQ.PUB);
-        configure(pub);
-        pub.bind(address);
+        ZMQ.Socket push = c.socket(ZMQ.PUSH);
+        configure(push);
+        push.bind(address);
 
         while (running) {
             byte[][] b = null;
@@ -41,12 +41,12 @@ public class QueueListeningPublishSocket implements Runnable {
             byte[] msg = b[1];
             System.out.println("Server responder received " + new String(msg)
                     + " id " + new String(b[0]));
-            pub.send(id, ZMQ.SNDMORE);
-            pub.send(msg, 0);
+            push.send(id, ZMQ.SNDMORE);
+            push.send(msg, 0);
 
         }
 
-        pub.close();
+        push.close();
 
     }
 

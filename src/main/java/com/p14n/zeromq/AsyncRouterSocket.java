@@ -29,13 +29,12 @@ public abstract class AsyncRouterSocket implements Runnable {
         ZMQ.Socket server = c.socket(ZMQ.ROUTER);
         server.bind(frontendAddress);
 
-        ZMQ.Socket sub = c.socket(ZMQ.SUB);
-        sub.connect(backendAddress);
-        sub.subscribe("".getBytes());
+        ZMQ.Socket pull = c.socket(ZMQ.PULL);
+        pull.connect(backendAddress);
 
         ZMQ.Poller poller = new ZMQ.Poller(2);
         poller.register(server, ZMQ.Poller.POLLIN);
-        poller.register(sub, ZMQ.Poller.POLLIN);
+        poller.register(pull, ZMQ.Poller.POLLIN);
 
         while (running) {
             poller.poll();
@@ -59,8 +58,8 @@ public abstract class AsyncRouterSocket implements Runnable {
 
             if (poller.pollin(1)) {
                 // receive message
-                byte[] id = sub.recv(0);
-                byte[] msg = sub.recv(0);
+                byte[] id = pull.recv(0);
+                byte[] msg = pull.recv(0);
 
                 // Broker it
                 System.out.println("Server received response " + new String(msg)
@@ -71,7 +70,7 @@ public abstract class AsyncRouterSocket implements Runnable {
         }
 
         server.close();
-        sub.close();
+        pull.close();
 
     }
 
