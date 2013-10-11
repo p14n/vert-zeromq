@@ -2,12 +2,12 @@ package com.p14n.zeromq;
 
 import org.zeromq.ZMQ;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Dean Pehrsson-Chapman
@@ -20,9 +20,14 @@ public class TestClient implements Runnable {
         latch = new CountDownLatch(iterations);
     }
 
-    public void waitFor(){
+    public void waitFor() throws TimeoutException {
+        waitFor(30);
+    }
+    public void waitFor(int secs) throws TimeoutException {
         try {
-            latch.await(30, TimeUnit.SECONDS);
+            latch.await(secs, TimeUnit.SECONDS);
+            if(latch.getCount()!=0)
+                throw new TimeoutException("Not all messages received after "+secs+" seconds");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -53,7 +58,7 @@ public class TestClient implements Runnable {
         poller.register(client, ZMQ.Poller.POLLIN);
 
         int requestNbr = 0;
-        Set<String> msgOut = Collections.synchronizedSet(new HashSet<String>());
+        Set<String> msgOut = new HashSet<String>();
         while (running) {
             //  Tick once per second, pulling in arriving messages
             poller.poll(2000);
@@ -66,8 +71,12 @@ public class TestClient implements Runnable {
                     latch.countDown();
                     msgOut.remove(compare);
                 }
+                System.out.println(identity + " Client expecting another "+latch.getCount()+" messages");
 
-                if(latch.getCount()==0) break;
+                if(latch.getCount()==0) {
+                    running = false;
+                    break;
+                }
 
             }
             String out = String.format(identity+" request #%d", ++requestNbr);

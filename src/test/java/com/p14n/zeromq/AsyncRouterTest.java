@@ -2,6 +2,8 @@ package com.p14n.zeromq;
 
 import org.junit.Test;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * Created by Dean Pehrsson-Chapman
  * Date: 10/10/2013
@@ -9,7 +11,7 @@ import org.junit.Test;
 public class AsyncRouterTest {
 
     @Test
-    public void shouldReceiveAtLeastASingleResponse(){
+    public void shouldReceiveAtLeastASingleResponse() throws TimeoutException {
 
         AsyncRouter echo = new AsyncRouter("tcp://*:5558") {
             @Override
@@ -25,7 +27,7 @@ public class AsyncRouterTest {
 
     }
     @Test
-    public void shouldReceiveCorrelatedResponses(){
+    public void shouldReceiveCorrelatedResponses() throws TimeoutException {
 
         AsyncRouter echo = new AsyncRouter("tcp://*:5558") {
             @Override
