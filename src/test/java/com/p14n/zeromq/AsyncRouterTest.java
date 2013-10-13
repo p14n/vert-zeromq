@@ -13,12 +13,13 @@ public class AsyncRouterTest {
     @Test
     public void shouldReceiveAtLeastASingleResponse() throws TimeoutException {
 
-        AsyncRouter echo = new AsyncRouter("tcp://*:5558") {
-            @Override
-            protected void handleBlockingRequest(byte[] handler,byte[] msg, MessageResponder messageResponder) {
-                messageResponder.respond(msg);
-            }
-        };
+        AsyncRouter echo = new AsyncRouter("tcp://*:5558")
+                .handleRequest(new RequestHandler() {
+                    @Override
+                    public void handleRequest(byte[][] message, MessageResponder responder) {
+                        responder.respond(message[1]);
+                    }
+                });
         echo.start();
 
         TestClient client = new TestClient("tcp://localhost:5558",1);
@@ -29,12 +30,13 @@ public class AsyncRouterTest {
     @Test
     public void shouldReceiveCorrelatedResponses() throws TimeoutException {
 
-        AsyncRouter echo = new AsyncRouter("tcp://*:5558") {
+        AsyncRouter echo = new AsyncRouter("tcp://*:5558")
+                .handleRequest(new RequestHandler() {
             @Override
-            protected void handleBlockingRequest(byte[] handler,byte[] msg, MessageResponder messageResponder) {
-                messageResponder.respond(msg);
+            public void handleRequest(byte[][] message, MessageResponder responder) {
+                responder.respond(message[1]);
             }
-        };
+        });
         echo.start();
 
         TestClient client3 = new TestClient("tcp://localhost:5558",5);

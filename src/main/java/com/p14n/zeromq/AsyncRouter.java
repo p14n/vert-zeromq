@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by Dean Pehrsson-Chapman
  * Date: 10/10/2013
  */
-public abstract class AsyncRouter {
+public class AsyncRouter {
 
     ExecutorService service;
     QueueListeningPublishSocket back;
@@ -19,34 +19,41 @@ public abstract class AsyncRouter {
     BlockingQueue<byte[][]> queue;
     ZMQ.Context c;
     String address;
+    RequestHandler handler;
+
+    public AsyncRouter handleRequest(RequestHandler handler) {
+        this.handler = handler;
+        return this;
+    }
 
     public AsyncRouter(String address) {
         this.address = address;
         queue = new LinkedBlockingQueue<byte[][]>();
     }
 
-    public void start() {
+    public AsyncRouter start() {
         c = ZMQ.context(2);
         service = Executors.newFixedThreadPool(2);
-        front = new AsyncRouterSocket(c, queue, address, "inproc://backend") {
+        front = new AsyncRouterSocket(c, queue, address, "inproc://zmq-async-backend") {
             @Override
-            protected void handleBlockingRequest(byte[] handler, byte[] msg, MessageResponder messageResponder) {
-                AsyncRouter.this.handleBlockingRequest(handler, msg, messageResponder);
+            protected void handleBlockingRequest(byte[][] msg, MessageResponder messageResponder) {
+                if(handler!=null)
+                    handler.handleRequest(msg,messageResponder);
             }
         };
-        back = new QueueListeningPublishSocket(c, queue, "inproc://backend");
+        back = new QueueListeningPublishSocket(c, queue, "inproc://zmq-async-backend");
         service.submit(back);
         service.submit(front);
+        return this;
     }
 
-    public void stop() {
+    public AsyncRouter stop() {
         back.setRunning(false);
         front.setRunning(false);
         service.shutdown();
         queue.clear();
         c.term();
+        return this;
     }
-
-    protected abstract void handleBlockingRequest(byte[] handler, byte[] msg, MessageResponder messageResponder);
 
 }

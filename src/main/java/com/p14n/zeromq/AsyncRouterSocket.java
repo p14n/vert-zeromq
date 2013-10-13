@@ -36,23 +36,30 @@ public abstract class AsyncRouterSocket implements Runnable {
         poller.register(server, ZMQ.Poller.POLLIN);
         poller.register(pull, ZMQ.Poller.POLLIN);
 
+        byte[][] results = new byte[2][];
+
         while (running) {
             poller.poll();
             if (poller.pollin(0)) {
 
+                int resultIndex = 0;
+
                 // receive message
-                byte[] id = server.recv(0);
-                byte[] msg = server.recv(0);
-                byte[] handler = null;
-                if(server.hasReceiveMore()){
-                    handler = msg;
-                    msg = server.recv(0);
+                results[resultIndex++] = server.recv(0);
+                while(server.hasReceiveMore()){
+
+                    if(resultIndex==results.length){
+                        byte[][] tmp = new byte[resultIndex+1][];
+                        System.arraycopy(results,0,tmp,0,resultIndex);
+                        results = tmp;
+                    }
+
+                    byte[] resultBytes = server.recv(0);
+                    results[resultIndex++] = resultBytes;
                 }
 
                 // Broker it
-                System.out.println("Server received request " + new String(msg)
-                        + " id " + new String(id));
-                handleBlockingRequest(handler,msg, new MessageResponder(id, q));
+                handleBlockingRequest(results, new MessageResponder(results[0], q));
 
             }
 
@@ -62,8 +69,6 @@ public abstract class AsyncRouterSocket implements Runnable {
                 byte[] msg = pull.recv(0);
 
                 // Broker it
-                System.out.println("Server received response " + new String(msg)
-                        + " id " + new String(id));
                 server.send(id, ZMQ.SNDMORE);
                 server.send(msg, 0);
             }
@@ -74,7 +79,7 @@ public abstract class AsyncRouterSocket implements Runnable {
 
     }
 
-    protected abstract void handleBlockingRequest(byte[] handler, byte[] msg, MessageResponder messageResponder);
+    protected abstract void handleBlockingRequest(byte[][] msg, MessageResponder messageResponder);
 
     public void setRunning(boolean running) {
         this.running = running;

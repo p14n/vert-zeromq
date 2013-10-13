@@ -15,20 +15,28 @@ import java.util.concurrent.TimeoutException;
  */
 public class VertxTest extends TestVerticle {
 
+    private TestClient createAndStartClient(){
+        TestClient client = new TestClient("tcp://localhost:5558", 1000);
+        client.setHandler("test");
+        new Thread(client).start();
+        return client;
+    }
+
     @Test
     public void shouldGetMessagesBackFromAVertHandler() {
 
         final VertxRouter r = new VertxRouter("tcp://*:5558", vertx.eventBus());
         r.start();
 
-        final TestClient client = new TestClient("tcp://localhost:5558", 5);
-        client.setHandler("test");
-        new Thread(client).start();
+        final TestClient client1 = createAndStartClient();
+        final TestClient client2 = createAndStartClient();
+        final TestClient client3 = createAndStartClient();
+        final TestClient client4 = createAndStartClient();
+        final TestClient client5 = createAndStartClient();
 
         vertx.eventBus().registerHandler("test", new Handler<Message<byte[]>>() {
             @Override
             public void handle(Message<byte[]> message) {
-                System.out.println("VERT received " + new String(message.body()));
                 message.reply(message.body());
             }
         });
@@ -36,7 +44,11 @@ public class VertxTest extends TestVerticle {
             @Override
             public void run() {
                 try {
-                    client.waitFor();
+                    client1.waitFor();
+                    client2.waitFor();
+                    client3.waitFor();
+                    client4.waitFor();
+                    client5.waitFor();
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }

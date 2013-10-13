@@ -2,6 +2,7 @@ package com.p14n.zeromq.vertx;
 
 import com.p14n.zeromq.AsyncRouter;
 import com.p14n.zeromq.MessageResponder;
+import com.p14n.zeromq.RequestHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
@@ -17,17 +18,20 @@ public class VertxRouter extends AsyncRouter {
     public VertxRouter(String address, EventBus bus) {
         super(address);
         this.bus = bus;
-    }
-
-    @Override
-    protected void handleBlockingRequest(byte[] handler, byte[] msg,final MessageResponder messageResponder) {
-        bus.send(new String(handler),msg,new Handler<Message<byte[]>>() {
+        handleRequest(new RequestHandler() {
             @Override
-            public void handle(Message<byte[]> message) {
-                messageResponder.respond(message.body());
+            public void handleRequest(byte[][] message, final MessageResponder responder) {
+                eventBus().send(new String(message[1]),message[2],new Handler<Message<byte[]>>() {
+                    @Override
+                    public void handle(Message<byte[]> message) {
+                        responder.respond(message.body());
+                    }
+                });
             }
         });
-        System.out.println("sent to VERT " + new String(msg));
+    }
 
+    public EventBus eventBus(){
+        return bus;
     }
 }

@@ -37,13 +37,9 @@ public class QueueListeningPublishSocket implements Runnable {
             }
             if (b == null) continue;
 
-            byte[] id = b[0];
-            byte[] msg = b[1];
-            System.out.println("Server responder received " + new String(msg)
-                    + " id " + new String(b[0]));
-            push.send(id, ZMQ.SNDMORE);
-            push.send(msg, 0);
-
+            for(int index = 0;index<b.length;index++){
+                push.send(b[index], index==b.length-1?0:ZMQ.SNDMORE);
+            }
         }
 
         push.close();

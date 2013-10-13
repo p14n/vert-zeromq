@@ -60,32 +60,29 @@ public class TestClient implements Runnable {
         int requestNbr = 0;
         Set<String> msgOut = new HashSet<String>();
         while (running) {
+
+            String out = String.format(identity+" request #%d", ++requestNbr);
+            msgOut.add(out);
+            if(handler!=null)
+                client.send(handler,ZMQ.SNDMORE);
+            client.send(out, 0);
+
+
             //  Tick once per second, pulling in arriving messages
             poller.poll(2000);
             if (poller.pollin(0)) {
                 byte msg[] = client.recv(0);
-                System.out.println(identity + " Client received "
-                        + new String(msg));
                 String compare = new String(msg);
                 if(msgOut.contains(compare)){
                     latch.countDown();
                     msgOut.remove(compare);
                 }
-                System.out.println(identity + " Client expecting another "+latch.getCount()+" messages");
-
                 if(latch.getCount()==0) {
                     running = false;
                     break;
                 }
 
             }
-            String out = String.format(identity+" request #%d", ++requestNbr);
-            msgOut.add(out);
-            System.out.println(identity + " Client sent "
-                    + msgOut);
-            if(handler!=null)
-                client.send(handler,ZMQ.SNDMORE);
-            client.send(out, 0);
         }
         client.close();
         ctx.term();
