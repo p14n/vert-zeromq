@@ -3,7 +3,7 @@ vert-zeromq
 
 Providing a bridge from zero-mq to the vert-x event bus.
 
-Create the bridge in you verticle start method.
+Create the bridge in your verticle start method.
 ```java
 final ZeroMQBridge r = new ZeroMQBridge("tcp://*:5558", vertx.eventBus());
 r.start();
