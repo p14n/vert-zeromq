@@ -58,8 +58,11 @@ public abstract class AsyncRouterSocket implements Runnable {
                     results[resultIndex++] = resultBytes;
                 }
 
+                byte[][] copy = new byte[resultIndex][];
+                System.arraycopy(results,0,copy,0,resultIndex);
+
                 // Broker it
-                handleBlockingRequest(results, new MessageResponder(results[0], q));
+                handleBlockingRequest(copy, new MessageResponder(copy[0], q));
 
             }
 

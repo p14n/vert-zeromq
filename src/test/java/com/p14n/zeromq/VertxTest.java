@@ -1,6 +1,6 @@
 package com.p14n.zeromq;
 
-import com.p14n.zeromq.vertx.VertxRouter;
+import com.p14n.zeromq.vertx.ZeroMQBridge;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
@@ -16,23 +16,27 @@ import java.util.concurrent.TimeoutException;
 public class VertxTest extends TestVerticle {
 
     private TestClient createAndStartClient(){
-        TestClient client = new TestClient("tcp://localhost:5558", 1000);
+        TestClient client = new TestClient("tcp://localhost:5558", 100);
         client.setHandler("test");
         new Thread(client).start();
         return client;
     }
 
+    private TestClient[] createClients(int count){
+        TestClient[] clients = new TestClient[count];
+        for(int i=0;i<count;i++){
+            clients[i] = createAndStartClient();
+        }
+        return clients;
+    }
+
     @Test
     public void shouldGetMessagesBackFromAVertHandler() {
 
-        final VertxRouter r = new VertxRouter("tcp://*:5558", vertx.eventBus());
+        final ZeroMQBridge r = new ZeroMQBridge("tcp://*:5558", vertx.eventBus());
         r.start();
 
-        final TestClient client1 = createAndStartClient();
-        final TestClient client2 = createAndStartClient();
-        final TestClient client3 = createAndStartClient();
-        final TestClient client4 = createAndStartClient();
-        final TestClient client5 = createAndStartClient();
+        final TestClient[] clients = createClients(100);
 
         vertx.eventBus().registerHandler("test", new Handler<Message<byte[]>>() {
             @Override
@@ -40,18 +44,17 @@ public class VertxTest extends TestVerticle {
                 message.reply(message.body());
             }
         });
+        final long start = System.currentTimeMillis();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    client1.waitFor();
-                    client2.waitFor();
-                    client3.waitFor();
-                    client4.waitFor();
-                    client5.waitFor();
+                    for(TestClient c:clients)
+                        c.waitFor(10);
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }
+                System.out.print("Took "+(System.currentTimeMillis()-start));
                 VertxAssert.testComplete();
                 r.stop();
             }
