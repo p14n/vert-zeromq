@@ -1,8 +1,8 @@
 package com.p14n.zeromq;
 
+import com.p14n.zeromq.vertx.AsyncSocket;
 import com.p14n.zeromq.vertx.ContextSocketResponder;
 import com.p14n.zeromq.vertx.ZeroMQBridge;
-import com.p14n.zeromq.vertx.AsyncSocket;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -33,13 +33,12 @@ public class VertxTest extends TestVerticle {
         return clients;
     }
 
-    @Test
     public void shouldGetMessagesBackFromAVertHandler() {
 
         final ZeroMQBridge r = new ZeroMQBridge("tcp://*:5558", vertx.eventBus());
         r.start();
 
-        final TestClient[] clients = createClients(100);
+        final TestClient[] clients = createClients(10);
 
         vertx.eventBus().registerHandler("test", new Handler<Message<byte[]>>() {
             @Override
@@ -57,19 +56,17 @@ public class VertxTest extends TestVerticle {
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.print("Took "+(System.currentTimeMillis()-start));
+                System.out.print("a Took "+(System.currentTimeMillis()-start));
                 VertxAssert.testComplete();
                 r.stop();
             }
         }).start();
     }
-    @Test
     public void shouldGetMessagesBackFromIOOnEventLoop() {
 
         final AsyncSocket s = new AsyncSocket("tcp://*:5558", vertx){
             @Override
             protected void handleRead(byte[][] results, Vertx vertx, ContextSocketResponder responder) {
-                System.out.print("Replying to "+results[0]+" with "+results[2]);
                 responder.respond(results[2]);
             }
         };
@@ -87,9 +84,34 @@ public class VertxTest extends TestVerticle {
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.print("Took " + (System.currentTimeMillis() - start));
+                System.out.print("b Took " + (System.currentTimeMillis() - start));
                 VertxAssert.testComplete();
             }
         }).start();
     }
+
+    @Test
+    public void test1(){
+        shouldGetMessagesBackFromAVertHandler();
+    }
+    @Test
+    public void test2(){
+        shouldGetMessagesBackFromIOOnEventLoop();
+    }
+    @Test
+    public void test3(){
+        shouldGetMessagesBackFromAVertHandler();
+    }
+    @Test
+    public void test4(){
+        shouldGetMessagesBackFromIOOnEventLoop();
+    }
+   /* @Test
+    public void test5(){
+        shouldGetMessagesBackFromAVertHandler();
+    }
+    @Test
+    public void test6(){
+        shouldGetMessagesBackFromIOOnEventLoop();
+    }*/
 }

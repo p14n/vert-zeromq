@@ -44,8 +44,6 @@ public class AsyncSocket {
                                     public void run() {
 
                                         final byte[][] results = new byte[3][];
-                                        System.out.println("loop " + w.isEventLoop());
-                                        System.out.println("Reading from thread " + Thread.currentThread().getId());
                                         int resultIndex = 0;
                                         // receive message
                                         results[resultIndex++] = server.recv(0);

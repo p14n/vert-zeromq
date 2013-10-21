@@ -22,16 +22,9 @@ public class ContextSocketResponder {
         c.execute(loop,new Runnable() {
             @Override
             public void run() {
-                System.out.println("Sending from thread " + Thread.currentThread().getId());
                 server.send(id, ZMQ.SNDMORE);
                 server.send(msg, 0);
-                System.out.println("Sent " + new String(msg) + " to " + new String(id));
             }
         });
-/*        vertx.runOnContext(new Handler<Void>() {
-            @Override
-            public void handle(Void aVoid) {
-            }
-        });*/
     }
 }
