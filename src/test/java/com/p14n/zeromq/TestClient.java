@@ -69,7 +69,7 @@ public class TestClient implements Runnable {
 
 
             //  Tick once per second, pulling in arriving messages
-            poller.poll(2000);
+            poller.poll(5000);
             if (poller.pollin(0)) {
                 byte msg[] = client.recv(0);
                 String compare = new String(msg);

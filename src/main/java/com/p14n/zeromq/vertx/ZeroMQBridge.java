@@ -24,7 +24,12 @@ public class ZeroMQBridge extends AsyncRouter {
                 eventBus().send(new String(message[1]), message[2], new Handler<Message<byte[]>>() {
                     @Override
                     public void handle(Message<byte[]> message) {
-                        responder.respond(message.body());
+                        String replyAddress = message.replyAddress();
+                        if(replyAddress==null){
+                            responder.respond(message.body());
+                        } else {
+                            responder.respond(message.body(),replyAddress.getBytes());
+                        }
                     }
                 });
             }

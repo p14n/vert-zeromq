@@ -22,6 +22,7 @@ public abstract class AsyncRouterSocket implements Runnable {
     String backendAddress;
     boolean running = true;
     ZMQ.Context c;
+    byte[][] results = new byte[2][];
 
     @Override
     public void run() {
@@ -36,50 +37,67 @@ public abstract class AsyncRouterSocket implements Runnable {
         poller.register(server, ZMQ.Poller.POLLIN);
         poller.register(pull, ZMQ.Poller.POLLIN);
 
-        byte[][] results = new byte[2][];
+
 
         while (running) {
             poller.poll();
             if (poller.pollin(0)) {
 
-                int resultIndex = 0;
-
-                // receive message
-                results[resultIndex++] = server.recv(0);
-                while(server.hasReceiveMore()){
-
-                    if(resultIndex==results.length){
-                        byte[][] tmp = new byte[resultIndex+1][];
-                        System.arraycopy(results,0,tmp,0,resultIndex);
-                        results = tmp;
-                    }
-
-                    byte[] resultBytes = server.recv(0);
-                    results[resultIndex++] = resultBytes;
-                }
-
-                byte[][] copy = new byte[resultIndex][];
-                System.arraycopy(results,0,copy,0,resultIndex);
+                byte[][] msg = fromSocket(server);
 
                 // Broker it
-                handleBlockingRequest(copy, new MessageResponder(copy[0], q));
+                handleBlockingRequest(msg, new MessageResponder(msg[0], q));
 
             }
 
             if (poller.pollin(1)) {
                 // receive message
-                byte[] id = pull.recv(0);
-                byte[] msg = pull.recv(0);
+                byte[][] msg = fromSocket(pull);
 
                 // Broker it
-                server.send(id, ZMQ.SNDMORE);
-                server.send(msg, 0);
+                for(int i = 0 ;i<msg.length;i++){
+                    if(i==msg.length-1){
+                        server.send(msg[i], 0);
+                    } else {
+                        server.send(msg[i], ZMQ.SNDMORE);
+                    }
+                }
             }
         }
 
         server.close();
         pull.close();
 
+    }
+
+    private byte[][] fromSocket(ZMQ.Socket server) {
+        int resultIndex = 0;
+
+        // receive message
+        resultIndex = receivemessage(server, resultIndex);
+
+        byte[][] copy = new byte[resultIndex][];
+        System.arraycopy(results,0,copy,0,resultIndex);
+        return copy;
+    }
+
+    private int receivemessage(ZMQ.Socket server, int resultIndex) {
+        results[resultIndex++] = server.recv(0);
+        while(server.hasReceiveMore()){
+
+            checkBufferSize(resultIndex);
+            byte[] resultBytes = server.recv(0);
+            results[resultIndex++] = resultBytes;
+        }
+        return resultIndex;
+    }
+
+    private void checkBufferSize(int resultIndex) {
+        if(resultIndex==results.length){
+            byte[][] tmp = new byte[resultIndex+1][];
+            System.arraycopy(results,0,tmp,0,resultIndex);
+            results = tmp;
+        }
     }
 
     protected abstract void handleBlockingRequest(byte[][] msg, MessageResponder messageResponder);

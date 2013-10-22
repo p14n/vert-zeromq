@@ -19,4 +19,8 @@ public class MessageResponder {
     public void respond(byte[] msg){
         q.add(new byte[][]{id,msg});
     }
+
+    public void respond(byte[] msg, byte[] address) {
+        q.add(new byte[][]{id,msg,address});
+    }
 }
