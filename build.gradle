@@ -9,6 +9,9 @@ project.ext.vertxVersion = "2.0.0-final"
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url "http://repo.typesafe.com/typesafe/repo"
+    }
 }
 
 dependencies {
