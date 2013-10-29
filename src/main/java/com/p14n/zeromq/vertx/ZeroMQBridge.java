@@ -80,9 +80,9 @@ public class ZeroMQBridge extends AsyncRouter {
                 @Override
                 public void handle(AsyncResult<Void> event) {
                     if (event.succeeded()) {
-                        info("Registered handler " + handler);
+                        info("Registered 0mq handler " + handler);
                     } else {
-                        error("Register handler failed " + handler,event.cause());
+                        error("Register 0mq handler "+handler+" failed",event.cause());
                     }
                 }
             });

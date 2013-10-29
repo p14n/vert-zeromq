@@ -1,19 +1,16 @@
 package com.p14n.zeromq.vertx;
 
 import org.junit.Assert;
-import org.junit.runner.RunWith;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.testframework.TestClientBase;
-import org.vertx.testtools.JavaClassRunner;
 import org.zeromq.ZMQ;
 
 /**
  * Created by Dean Pehrsson-Chapman
  * Date: 29/10/2013
  */
-@RunWith(JavaClassRunner.class)
 public class ZeroMQBridgeVerticleTestDeployer extends TestClientBase {
 
   @Override
