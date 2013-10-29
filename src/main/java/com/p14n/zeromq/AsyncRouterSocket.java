@@ -17,18 +17,17 @@ public abstract class AsyncRouterSocket implements Runnable {
         this.c = c;
     }
 
-    BlockingQueue<byte[][]> q;
-    String frontendAddress;
-    String backendAddress;
+    private BlockingQueue<byte[][]> q;
+    private String frontendAddress;
+    private String backendAddress;
     boolean running = true;
-    ZMQ.Context c;
-    byte[][] results = new byte[2][];
+    private ZMQ.Context c;
+    private byte[][] results = new byte[2][];
 
     @Override
     public void run() {
 
-        ZMQ.Socket server = c.socket(ZMQ.ROUTER);
-        server.bind(frontendAddress);
+        ZMQ.Socket server = createFrontEndSocket(c,frontendAddress);
 
         ZMQ.Socket pull = c.socket(ZMQ.PULL);
         pull.connect(backendAddress);
@@ -36,8 +35,6 @@ public abstract class AsyncRouterSocket implements Runnable {
         ZMQ.Poller poller = new ZMQ.Poller(2);
         poller.register(server, ZMQ.Poller.POLLIN);
         poller.register(pull, ZMQ.Poller.POLLIN);
-
-
 
         while (running) {
             poller.poll();
@@ -68,6 +65,12 @@ public abstract class AsyncRouterSocket implements Runnable {
         server.close();
         pull.close();
 
+    }
+
+    protected ZMQ.Socket createFrontEndSocket(ZMQ.Context c,String frontendAddress) {
+        ZMQ.Socket server = c.socket(ZMQ.ROUTER);
+        server.bind(frontendAddress);
+        return server;
     }
 
     private byte[][] fromSocket(ZMQ.Socket server) {

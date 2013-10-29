@@ -4,7 +4,7 @@ group = 'com.p14n'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
-project.ext.vertxVersion = "2.0.0-final"
+project.ext.vertxVersion = "2.0.2-final"
 
 repositories {
     mavenLocal()
@@ -16,10 +16,11 @@ repositories {
 
 dependencies {
 
+    //compile 'org.jeromq:jeromq:0.2.0'
     compile 'org.jeromq:jeromq:0.3.0-SNAPSHOT'
     compile "io.vertx:vertx-core:$vertxVersion"
     compile "io.vertx:vertx-platform:$vertxVersion"
     testCompile 'junit:junit:4.11'
     testCompile "io.vertx:testtools:$vertxVersion"
-
+    testCompile "io.vertx:vertx-testframework:2.0.0-final"
 }

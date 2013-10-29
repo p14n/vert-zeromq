@@ -25,13 +25,14 @@ public class AsyncRouterTest {
         TestClient client = new TestClient("tcp://localhost:5558",1);
         new Thread(client).start();
         client.waitFor();
+        System.out.println("Test done");
+        echo.stop();
 
     }
     @Test
     public void shouldReceiveCorrelatedResponses() throws TimeoutException {
 
-        AsyncRouter echo = new AsyncRouter("tcp://*:5558")
-                .handleRequest(new RequestHandler() {
+        AsyncRouter echo = new AsyncRouter("tcp://*:5558").handleRequest(new RequestHandler() {
             @Override
             public void handleRequest(byte[][] message, MessageResponder responder) {
                 responder.respond(message[1]);
@@ -51,6 +52,8 @@ public class AsyncRouterTest {
         client3.waitFor();
         client2.waitFor();
         client1.waitFor();
+
+        echo.stop();
 
     }
 }

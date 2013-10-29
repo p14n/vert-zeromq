@@ -67,10 +67,10 @@ public class TestClient implements Runnable {
                 client.send(handler,ZMQ.SNDMORE);
             client.send(out, 0);
 
-
             //  Tick once per second, pulling in arriving messages
             poller.poll(5000);
             if (poller.pollin(0)) {
+
                 byte msg[] = client.recv(0);
                 String compare = new String(msg);
                 if(msgOut.contains(compare)){

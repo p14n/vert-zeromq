@@ -3,8 +3,6 @@ package com.p14n.zeromq;
 import org.zeromq.ZMQ;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -13,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class AsyncRouter {
 
-    ExecutorService service;
+   // ExecutorService service;
     QueueListeningPublishSocket back;
     AsyncRouterSocket front;
     BlockingQueue<byte[][]> queue;
@@ -33,7 +31,6 @@ public class AsyncRouter {
 
     public AsyncRouter start() {
         c = ZMQ.context(2);
-        service = Executors.newFixedThreadPool(2);
         front = new AsyncRouterSocket(c, queue, address, "inproc://zmq-async-backend") {
             @Override
             protected void handleBlockingRequest(byte[][] msg, MessageResponder messageResponder) {
@@ -42,18 +39,21 @@ public class AsyncRouter {
             }
         };
         back = new QueueListeningPublishSocket(c, queue, "inproc://zmq-async-backend");
-        service.submit(back);
-        service.submit(front);
+        run(back);
+        run(front);
         return this;
     }
 
     public AsyncRouter stop() {
         back.setRunning(false);
         front.setRunning(false);
-        service.shutdown();
         queue.clear();
         c.term();
         return this;
+    }
+
+    protected void run(Runnable runnable){
+        new Thread(runnable).start();
     }
 
 }
