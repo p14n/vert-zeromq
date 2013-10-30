@@ -1,16 +1,10 @@
 package com.p14n.zeromq.vertx;
 
-import com.p14n.zeromq.AsyncRouter;
-import com.p14n.zeromq.MessageResponder;
-import com.p14n.zeromq.RequestHandler;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
+import com.p14n.zeromq.*;
+import org.vertx.java.core.*;
+import org.vertx.java.core.eventbus.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Dean Pehrsson-Chapman
@@ -51,7 +45,7 @@ public class ZeroMQBridge extends AsyncRouter {
         });
     }
 
-   @Override
+    @Override
     protected void run(final Runnable runnable) {
         vertx.runOnContext(new Handler<Void>() {
             @Override
@@ -82,7 +76,7 @@ public class ZeroMQBridge extends AsyncRouter {
                     if (event.succeeded()) {
                         info("Registered 0mq handler " + handler);
                     } else {
-                        error("Register 0mq handler "+handler+" failed",event.cause());
+                        error("Register 0mq handler " + handler + " failed", event.cause());
                     }
                 }
             });
@@ -93,15 +87,6 @@ public class ZeroMQBridge extends AsyncRouter {
                 zmqHandlers.remove(handler);
             }
         }
-    }
-
-    protected void error(String s, Throwable cause) {
-        System.err.println(s);
-        if(cause!=null) cause.printStackTrace();
-    }
-
-    protected void info(String s) {
-        System.out.println(s);
     }
 
     public EventBus eventBus() {

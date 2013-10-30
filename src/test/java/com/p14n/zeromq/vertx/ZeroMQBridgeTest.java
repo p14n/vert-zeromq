@@ -1,25 +1,24 @@
 package com.p14n.zeromq.vertx;
 
-import com.p14n.zeromq.TestClient;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.testtools.TestVerticle;
-import org.vertx.testtools.VertxAssert;
+import com.p14n.zeromq.*;
+import org.junit.*;
 
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * Created by Dean Pehrsson-Chapman
  * Date: 10/10/2013
  */
 @Ignore("No longer works as the verticle needs to be a worker - needs rewriting")
-public class ZeroMQBridgeTest extends TestVerticle {
+public class ZeroMQBridgeTest {
+
+    public static void main(String ars[]){
+        new ZeroMQBridgeTest().shouldGetMessagesBackFromAVertHandler();
+    }
 
     private TestClient createAndStartClient(){
         TestClient client = new TestClient("tcp://localhost:5558", 10);
-        client.setHandler("test");
+        client.setHandler("echo");
         new Thread(client).start();
         return client;
     }
@@ -34,41 +33,23 @@ public class ZeroMQBridgeTest extends TestVerticle {
 
     public void shouldGetMessagesBackFromAVertHandler() {
 
-        final ZeroMQBridge r = new ZeroMQBridge("tcp://*:5558", vertx);
-        r.start();
+        final TestClient[] clients = createClients(100);
 
-        final TestClient[] clients = createClients(10);
-
-        vertx.eventBus().registerHandler("test", new Handler<Message<byte[]>>() {
-            @Override
-            public void handle(Message<byte[]> message) {
-                message.reply(message.body());
-            }
-        });
         final long start = System.currentTimeMillis();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     for(TestClient c:clients)
-                        c.waitFor(10);
+                        c.waitFor(100);
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }
                 System.out.print("a Took "+(System.currentTimeMillis()-start));
-                VertxAssert.testComplete();
-                r.stop();
+
             }
         }).start();
     }
 
 
-    @Test
-    public void test1(){
-        shouldGetMessagesBackFromAVertHandler();
-    }
-    @Test
-    public void test3(){
-        shouldGetMessagesBackFromAVertHandler();
-    }
 }

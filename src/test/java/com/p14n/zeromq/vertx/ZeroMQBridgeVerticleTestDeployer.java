@@ -13,6 +13,10 @@ import org.zeromq.ZMQ;
  */
 public class ZeroMQBridgeVerticleTestDeployer extends TestClientBase {
 
+    public static void main(String[] args){
+        performClientTests();
+    }
+
   @Override
     public void start() {
         super.start();
@@ -38,13 +42,13 @@ public class ZeroMQBridgeVerticleTestDeployer extends TestClientBase {
         });
     }
 
-    private void performClientTests() {
+    private static void performClientTests() {
 
         final String address = "tcp://localhost:5558";
         final ZMQ.Context ctx = ZMQ.context(1);
         final ZMQ.Socket registered = ctx.socket(ZMQ.DEALER);
         registered.connect(address);
-        registered.send("register:test".getBytes());
+        registered.send("register:testHandler".getBytes());
 
         System.out.println("registered");
 
@@ -56,7 +60,7 @@ public class ZeroMQBridgeVerticleTestDeployer extends TestClientBase {
 
         final ZMQ.Socket client = ctx.socket(ZMQ.DEALER);
         client.connect(address);
-        client.send("test".getBytes(), ZMQ.SNDMORE);
+        client.send("testHandler".getBytes(), ZMQ.SNDMORE);
         client.send("oh".getBytes(), 0);
 
         System.out.println("sent");

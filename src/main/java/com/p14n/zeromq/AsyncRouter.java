@@ -30,7 +30,9 @@ public class AsyncRouter {
     }
 
     public AsyncRouter start() {
+
         c = ZMQ.context(2);
+
         front = new AsyncRouterSocket(c, queue, address, "inproc://zmq-async-backend") {
             @Override
             protected void handleBlockingRequest(byte[][] msg, MessageResponder messageResponder) {
@@ -45,15 +47,28 @@ public class AsyncRouter {
     }
 
     public AsyncRouter stop() {
-        back.setRunning(false);
-        front.setRunning(false);
-        queue.clear();
-        c.term();
+        if(back!=null)
+            back.setRunning(false);
+        if(front!=null)
+            front.setRunning(false);
+        if(queue!=null)
+            queue.clear();
+        if(c!=null)
+            c.term();
         return this;
     }
 
     protected void run(Runnable runnable){
         new Thread(runnable).start();
     }
+    protected void error(String s, Throwable cause) {
+        System.err.println(s);
+        if(cause!=null) cause.printStackTrace();
+    }
+
+    protected void info(String s) {
+        System.out.println(s);
+    }
+
 
 }

@@ -1,7 +1,9 @@
+apply from: "gradle/vertx.gradle"
+
 apply plugin: 'java'
 
-group = 'com.p14n'
-version = '0.0.1-SNAPSHOT'
+group = 'p14n'
+version = '0.0.1'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 project.ext.vertxVersion = "2.0.2-final"
@@ -18,9 +20,44 @@ dependencies {
 
     //compile 'org.jeromq:jeromq:0.2.0'
     compile 'org.jeromq:jeromq:0.3.0-SNAPSHOT'
-    compile "io.vertx:vertx-core:$vertxVersion"
-    compile "io.vertx:vertx-platform:$vertxVersion"
+    provided "io.vertx:vertx-core:$vertxVersion"
+    provided "io.vertx:vertx-platform:$vertxVersion"
     testCompile 'junit:junit:4.11'
     testCompile "io.vertx:testtools:$vertxVersion"
     testCompile "io.vertx:vertx-testframework:2.0.0-final"
+}
+
+def configurePom(def pom) {
+    pom.project {
+        name rootProject.name
+        description 'Provides a bridge from a 0mq socket to the event bus'
+        inceptionYear '2013'
+        packaging 'jar'
+
+        url 'https://github.com/p14n/vert-zeromq'
+
+        developers {
+            developer {
+                id 'p14n'
+                name 'Dean Pehrsson-Chapman'
+                email 'dean@p14n.com'
+            }
+        }
+
+        scm {
+            url 'https://github.com/p14n/vert-zeromq'
+        }
+
+        licenses {
+            license {
+                name 'The name of the license used, e.g.: The Apache Software License, Version 2.0'
+                url 'http://directory.fsf.org/wiki/License:Expat'
+                distribution 'repo'
+            }
+        }
+
+        properties {
+            setProperty('project.build.sourceEncoding', 'UTF8')
+        }
+    }
 }

@@ -1,0 +1,13 @@
+{
+ "main":"com.p14n.zeromq.vertx.ZeroMQBridgeVerticle",
+ "worker":true,
+ "multi-threaded":true,
+ "description":"Provides a bridge from a 0mq socket to the event bus",
+  "licenses": ["MIT"],
+  "author": "Dean Pehrsson-Chapman",
+
+  // Optional fields
+  //"developers": ["Other Dev 1", "Other Dev 2"],
+  "keywords": ["zeromq", "0mq" ],
+  "homepage": "https://github.com/p14n/vert-zeromq"
+}
