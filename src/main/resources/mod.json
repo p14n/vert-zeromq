@@ -7,7 +7,7 @@
   "author": "Dean Pehrsson-Chapman",
 
   // Optional fields
-  //"developers": ["Other Dev 1", "Other Dev 2"],
+  "developers": ["Santiago Fernandez"],
   "keywords": ["zeromq", "0mq" ],
   "homepage": "https://github.com/p14n/vert-zeromq"
 }

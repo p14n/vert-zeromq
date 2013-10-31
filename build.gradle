@@ -42,6 +42,11 @@ def configurePom(def pom) {
                 name 'Dean Pehrsson-Chapman'
                 email 'dean@p14n.com'
             }
+            developer {
+                id 'santif'
+                name 'Santiago Fernandez'
+            }
+
         }
 
         scm {
