@@ -16,7 +16,7 @@ Config requires the address the module should listen on:
 
 ```json
 {
- "address":"tcp://*5558"
+ "address":"tcp://*:5558"
 }
 ```
 
