@@ -26,7 +26,7 @@ Config requires the address the module should listen on:
 * Unregister a 0mq handler by sending a single message 'unregister:myHandlerName'.
 
 
-# Calling an event bus handler
+### Calling an event bus handler
 
 ```java
 ZMQ.Context ctx = ZMQ.context(1);
@@ -39,7 +39,7 @@ client.send("hello".getBytes(), 0); //Send the message
 byte[] response = client.recv(); //Get the response
 Assert.assertEquals("hello", new String(response));
 ```
-# Registering a socket as a handler, sending to it and receiving a reply
+### Registering a socket as a handler, sending to it and receiving a reply
 
 ```java
 String address = "tcp://localhost:5558";
