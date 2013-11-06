@@ -1,6 +1,8 @@
 vert-zeromq
 ===========
 
+![Build status](https://travis-ci.org/p14n/vert-zeromq.png)
+
 Providing a bridge from zero-mq to the vert-x event bus.
 
 This module enables you to remotely call a handler on the bus, receive replies, and reply back.  It also allows you

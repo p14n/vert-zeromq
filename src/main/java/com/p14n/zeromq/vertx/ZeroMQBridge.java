@@ -59,6 +59,7 @@ public class ZeroMQBridge extends AsyncRouter {
         String command = new String(message[1]);
         if (command.startsWith(reg)) {
             final String handler = command.substring(reglength);
+            unregister(handler);
             Handler h = new Handler<Message<byte[]>>() {
                 @Override
                 public void handle(Message<byte[]> message) {
@@ -82,10 +83,15 @@ public class ZeroMQBridge extends AsyncRouter {
             });
         } else if (command.startsWith(unreg)) {
             String handler = command.substring(unreglength);
-            if (handler != null && zmqHandlers.containsKey(handler)) {
-                eventBus().unregisterHandler(handler, zmqHandlers.get(handler));
-                zmqHandlers.remove(handler);
-            }
+            unregister(handler);
+        }
+    }
+
+    private void unregister(String handler) {
+        if (handler != null && zmqHandlers.containsKey(handler)) {
+            eventBus().unregisterHandler(handler, zmqHandlers.get(handler));
+            zmqHandlers.remove(handler);
+            info("Unregistered 0mq handler " + handler);
         }
     }
 

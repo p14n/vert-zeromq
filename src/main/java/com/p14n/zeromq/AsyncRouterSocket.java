@@ -37,7 +37,8 @@ public abstract class AsyncRouterSocket implements Runnable {
         poller.register(pull, ZMQ.Poller.POLLIN);
 
         while (running) {
-            poller.poll();
+
+            poller.poll(1000);
             if (poller.pollin(0)) {
 
                 byte[][] msg = fromSocket(server);

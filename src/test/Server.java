@@ -5,7 +5,7 @@ import org.vertx.java.platform.*;
 public class Server extends Verticle {
 
     public void start() {
-        container.deployModule("p14n~vert-zeromq~0.0.1", container.config(), new AsyncResultHandler<String>() {
+        container.deployModule("p14n~vert-zeromq~0.0.1", container.config(),1, new AsyncResultHandler<String>() {
             public void handle(AsyncResult<String> deployResult) {
                 if (deployResult.succeeded()) {
                     container.logger().info("Deploy succeeded");

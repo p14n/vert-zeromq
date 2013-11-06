@@ -6,25 +6,22 @@ group = 'p14n'
 version = '0.0.1'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
-project.ext.vertxVersion = "2.0.2-final"
+project.ext.vertxVersion = "2.1M1"
 
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url "http://repo.typesafe.com/typesafe/repo"
-    }
 }
 
 dependencies {
 
-    //compile 'org.jeromq:jeromq:0.2.0'
-    compile 'org.jeromq:jeromq:0.3.0-SNAPSHOT'
+    compile 'org.zeromq:jeromq:0.3.1'
     provided "io.vertx:vertx-core:$vertxVersion"
     provided "io.vertx:vertx-platform:$vertxVersion"
     testCompile 'junit:junit:4.11'
-    testCompile "io.vertx:testtools:$vertxVersion"
+    testCompile "io.vertx:testtools:2.0.2-final"
     testCompile "io.vertx:vertx-testframework:2.0.0-final"
+
 }
 
 def configurePom(def pom) {

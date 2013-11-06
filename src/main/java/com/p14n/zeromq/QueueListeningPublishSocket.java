@@ -32,7 +32,7 @@ public class QueueListeningPublishSocket implements Runnable {
         while (running) {
             byte[][] b = null;
             try {
-                b = q.poll(2, TimeUnit.SECONDS);
+                b = q.poll(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
             }
             if (b == null) continue;

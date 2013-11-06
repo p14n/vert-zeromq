@@ -59,16 +59,13 @@ public class TestClient implements Runnable {
 
         int requestNbr = 0;
         Set<String> msgOut = new HashSet<String>();
+
         while (running) {
 
-            String out = String.format(identity+" request #%d", ++requestNbr);
-            msgOut.add(out);
-            if(handler!=null)
-                client.send(handler,ZMQ.SNDMORE);
-            client.send(out, 0);
+            requestNbr = send(identity, requestNbr, msgOut);
 
             //  Tick once per second, pulling in arriving messages
-            poller.poll(5000);
+            poller.poll(1000);
             if (poller.pollin(0)) {
 
                 byte msg[] = client.recv(0);
@@ -86,6 +83,15 @@ public class TestClient implements Runnable {
         }
         client.close();
         ctx.term();
+    }
+
+    private int send(String identity, int requestNbr, Set<String> msgOut) {
+        String out = String.format(identity+" request #%d", ++requestNbr);
+        msgOut.add(out);
+        if(handler!=null)
+            client.send(handler, ZMQ.SNDMORE);
+        client.send(out, 0);
+        return requestNbr;
     }
 
     public void setRunning(boolean running) {
