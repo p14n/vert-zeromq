@@ -1,1 +1,1 @@
-{"address":"tcp://*:5558"}
+{"address":"tcp://*:5558","timeout":"20000"}

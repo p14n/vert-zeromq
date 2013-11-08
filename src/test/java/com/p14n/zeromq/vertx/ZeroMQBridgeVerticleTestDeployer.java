@@ -79,11 +79,6 @@ public class ZeroMQBridgeVerticleTestDeployer extends TestClientBase {
         Assert.assertEquals("hai", new String(response3));
         System.out.println("complete");
 
-        try {
-            Thread.sleep(6000); //Lets see those timeout warnings
-        } catch (InterruptedException e) {
-
-        }
     }
 
 }

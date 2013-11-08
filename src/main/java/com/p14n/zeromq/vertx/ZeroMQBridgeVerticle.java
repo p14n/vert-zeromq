@@ -15,13 +15,14 @@ public class ZeroMQBridgeVerticle extends Verticle {
     public void start() {
 
         String address = getContainer().config().getString("address");
+        long timeout  = getContainer().config().getLong("timeout",5000);
         final Logger log = getContainer().logger();
         getContainer().logger().info("Starting ZeroMQBridge on " + address);
 
         if (address == null || address.length() == 0)
             throw new IllegalArgumentException("No address specified");
 
-        bridge = new ZeroMQBridge(address, vertx) {
+        bridge = new ZeroMQBridge(address, vertx, timeout) {
             @Override
             protected void error(String s, Throwable cause) {
                 log.error(s, cause);

@@ -49,7 +49,7 @@ public class ZeroMQBridgeTest {
     private static EchoSocket startEchoSocket(String address,String name) throws InterruptedException {
         EchoSocket echo = new EchoSocket(address,name);
         new Thread(echo).start();
-        Thread.sleep(100);
+        Thread.sleep(1000);
         return echo;
     }
     public static void testEchoSocket() throws InterruptedException {

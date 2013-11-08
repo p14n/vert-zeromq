@@ -36,7 +36,7 @@ public class ZeroMQBridge extends AsyncRouter {
     }
 
 
-    public ZeroMQBridge(String address, Vertx vertx, final int responseTimeout) {
+    public ZeroMQBridge(String address, Vertx vertx, final long responseTimeout) {
         super(address);
         this.vertx = vertx;
         setRequestHandler(new RequestHandler() {
@@ -49,46 +49,29 @@ public class ZeroMQBridge extends AsyncRouter {
                     if (handlerSocketids.contains(responder.getSocketId())) {
                         eventBus().send(new String(message[1]), message[2]);
                     } else {
-                        boolean IWantToHaemorrageMemory = true;
-                        if (!IWantToHaemorrageMemory) {
-                            eventBus().sendWithTimeout(new String(message[1]), message[2], responseTimeout,
-                                    new AsyncResultHandler<Message<byte[]>>() {
-                                        @Override
-                                        public void handle(AsyncResult<Message<byte[]>> event) {
-                                            if (event.succeeded()) {
-                                                Message<byte[]> message = event.result();
-                                                String replyAddress = message.replyAddress();
-                                                if (replyAddress == null) {
-                                                    responder.respond(message.body());
-                                                } else {
-                                                    responder.respond(message.body(), replyAddress.getBytes());
-                                                }
-                                            } else {
-                                                if (event.cause() instanceof ReplyException) {
-                                                    ReplyException ex = (ReplyException) event.cause();
-                                                    if (ReplyFailure.NO_HANDLERS.equals(ex.failureType())) {
-                                                        error("Send failed", event.cause());
-                                                        responder.respond(ex.failureType().name().getBytes());
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                        } else {
-                            eventBus().send(new String(message[1]), message[2],
-                                    new Handler<Message<byte[]>>() {
-                                        @Override
-                                        public void handle(Message<byte[]> message) {
+                        eventBus().sendWithTimeout(new String(message[1]), message[2], responseTimeout,
+                                new AsyncResultHandler<Message<byte[]>>() {
+                                    @Override
+                                    public void handle(AsyncResult<Message<byte[]>> event) {
+                                        if (event.succeeded()) {
+                                            Message<byte[]> message = event.result();
                                             String replyAddress = message.replyAddress();
                                             if (replyAddress == null) {
                                                 responder.respond(message.body());
                                             } else {
                                                 responder.respond(message.body(), replyAddress.getBytes());
                                             }
+                                        } else {
+                                            if (event.cause() instanceof ReplyException) {
+                                                ReplyException ex = (ReplyException) event.cause();
+                                                if (ReplyFailure.NO_HANDLERS.equals(ex.failureType())) {
+                                                    error("Send failed", event.cause());
+                                                    responder.respond(ex.failureType().name().getBytes());
+                                                }
+                                            }
                                         }
-                                    });
-
-                        }
+                                    }
+                                });
                     }
                 }
             }
@@ -109,8 +92,8 @@ public class ZeroMQBridge extends AsyncRouter {
         String command = new String(message[1]);
         if (command.startsWith(reg)) {
             final String handler = command.substring(reglength);
-            unregister(handler);
-            Handler h = new Handler<Message<byte[]>>() {
+            unregister(handler,responder.getSocketId());
+            Handler<Message<byte[]>> h = new Handler<Message<byte[]>>() {
                 @Override
                 public void handle(Message<byte[]> message) {
                     if (message.replyAddress() != null) {
@@ -120,6 +103,7 @@ public class ZeroMQBridge extends AsyncRouter {
                     }
                 }
             };
+            handlerSocketids.add(responder.getSocketId());
             zmqHandlers.put(handler, h);
             eventBus().registerHandler(handler, h, new Handler<AsyncResult<Void>>() {
                 @Override
@@ -133,14 +117,15 @@ public class ZeroMQBridge extends AsyncRouter {
             });
         } else if (command.startsWith(unreg)) {
             String handler = command.substring(unreglength);
-            unregister(handler);
+            unregister(handler,responder.getSocketId());
         }
     }
 
-    private void unregister(String handler) {
+    private void unregister(String handler,byte[] socketId) {
         if (handler != null && zmqHandlers.containsKey(handler)) {
             eventBus().unregisterHandler(handler, zmqHandlers.get(handler));
             zmqHandlers.remove(handler);
+            handlerSocketids.remove(socketId);
             info("Unregistered 0mq handler " + handler);
         }
     }
