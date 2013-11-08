@@ -1,1 +1,1 @@
-vertx-plumbr run Server.java -conf conf.json
+vertx run Server.java -conf conf.json

@@ -85,7 +85,7 @@ public class ZeroMQBridgeTest {
             public void run() {
                 try {
                     for(TestClient c:cls)
-                        c.waitFor((clients*requests)/500);
+                        c.waitFor(((clients*requests)/300)+1);
                 } catch (TimeoutException e) {
                     throw new RuntimeException(e);
                 }

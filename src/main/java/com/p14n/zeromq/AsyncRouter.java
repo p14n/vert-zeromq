@@ -19,7 +19,7 @@ public class AsyncRouter {
     String address;
     RequestHandler handler;
 
-    public AsyncRouter handleRequest(RequestHandler handler) {
+    public AsyncRouter setRequestHandler(RequestHandler handler) {
         this.handler = handler;
         return this;
     }

@@ -14,7 +14,7 @@ public class AsyncRouterTest {
     public void shouldReceiveAtLeastASingleResponse() throws TimeoutException {
 
         AsyncRouter echo = new AsyncRouter("tcp://*:5558")
-                .handleRequest(new RequestHandler() {
+                .setRequestHandler(new RequestHandler() {
                     @Override
                     public void handleRequest(byte[][] message, MessageResponder responder) {
                         responder.respond(message[1]);
@@ -32,7 +32,7 @@ public class AsyncRouterTest {
     @Test
     public void shouldReceiveCorrelatedResponses() throws TimeoutException {
 
-        AsyncRouter echo = new AsyncRouter("tcp://*:5558").handleRequest(new RequestHandler() {
+        AsyncRouter echo = new AsyncRouter("tcp://*:5558").setRequestHandler(new RequestHandler() {
             @Override
             public void handleRequest(byte[][] message, MessageResponder responder) {
                 responder.respond(message[1]);

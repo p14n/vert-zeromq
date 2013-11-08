@@ -16,6 +16,10 @@ public class MessageResponder {
         this.q = q;
     }
 
+    public byte[] getSocketId() {
+        return id;
+    }
+
     public void respond(byte[] msg){
         q.add(new byte[][]{id,msg});
     }
