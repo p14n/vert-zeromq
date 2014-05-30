@@ -1,12 +1,13 @@
 apply from: "gradle/vertx.gradle"
 
-apply plugin: 'java'
+apply plugin: "java"
+apply plugin: "maven"
 
 group = 'p14n'
-version = '0.0.1'
+version = '1.0.0'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
-project.ext.vertxVersion = "2.1M1"
+project.ext.vertxVersion = "2.1"
 
 repositories {
     mavenLocal()
@@ -15,7 +16,7 @@ repositories {
 
 dependencies {
 
-    compile 'org.zeromq:jeromq:0.3.1'
+    compile 'org.zeromq:jeromq:0.3.2'
     provided "io.vertx:vertx-core:$vertxVersion"
     provided "io.vertx:vertx-platform:$vertxVersion"
     testCompile 'junit:junit:4.11'
