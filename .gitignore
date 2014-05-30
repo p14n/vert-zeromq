@@ -3,3 +3,6 @@
 classes/
 build/
 mods/
+gradle/wrapper
+gradlew
+gradlew.bat
